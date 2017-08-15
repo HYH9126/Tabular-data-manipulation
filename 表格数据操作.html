@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        td {
+            text-align: center;
+        }
+        a{text-decoration:none; color:black;}
+    </style>
+   
+</head>
+
+<body>
+
+<form action="" name="form">
+    <p>
+        姓名:<input type="text" name="username"/>
+    </p>
+    <p>
+        年龄:<input type="text" name="age"/>
+    </p>
+    <p>
+        性别: <select name="sex">
+            <option value="男">男</option>
+            <option value="女">女</option>
+        </select>
+    </p>
+    <p>
+        <input type="button" value="添加" name="add"/>
+    </p>
+</form>
+    <input type="button" value="反选" class="btn">
+    <input type="button" value="批量删除"  class="btn"> 
+    <table id="tab1" width="100%" border="1">
+
+        <thead>
+        <tr>
+            <th>
+                <input id="checkAll" type="checkbox" /> 全选
+            </th>
+            <th id="id">ID</th>
+            <th>姓名</th>
+            <th id="age">年龄</th>
+            <th>性别</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        	
+        </tbody>
+    </table>
+    <script type="text/javascript">
+		var Data = [
+			{
+				id:1,
+				name:'宋小宝',
+				age:36,
+				sex:'男'
+			},
+			{
+				id:2,
+				name:'郭德纲',
+				age:43,
+				sex:'男'
+			},
+			{
+				id:3,
+				name:'黄渤',
+				age:28,
+				sex:'男'
+			},
+			{
+				id:4,
+				name:'赵丽颖',
+				age:25,
+				sex:'女'
+			},
+			{
+				id:5,
+				name:'刘亦菲',
+				age:22,
+				sex:'女'
+			}
+		];
+  	/*
+  	 	1.渲染页面
+  	 	2.上移下移删除
+  	 	3.全选
+  	 	4.反选
+  	 	5.批量删除
+  	 	6.添加数据
+  	 	7.排序
+  	 * */
+  		var tab = document.getElementById('tab1');
+  		var tb = tab.getElementsByTagName('tbody')[0];
+  		var checkAll = document.getElementById('checkAll');
+  		var btn = document.getElementsByClassName('btn');
+  		var tr = tb.getElementsByTagName('tr');
+  		var checks = tb.getElementsByTagName('input');
+  		var form = document.getElementsByTagName('form')[0];
+  		function fn(){
+  			tr = tb.getElementsByTagName('tr');
+  			checks = tb.getElementsByTagName('input');
+  		}
+  		//渲染页面
+  		for(var i=0;i<Data.length;i++){
+  			tb.insertRow();
+  			tb.rows[i].insertCell().innerHTML =  '<input type="checkbox" name="check"/>';
+  			for(var k in Data[i]){
+  				tb.rows[i].insertCell().innerHTML = Data[i][k];
+  			}
+  			tb.rows[i].insertCell().innerHTML =  '<a href="javascript:;">上移</a> | <a href="javascript:;">下移</a> | <a href="javascript:;">删除</a>';
+  		}
+  		//上移下移删除
+  		function move(){
+  			for(var i=0;i<tr.length;i++){
+  				tr[i].index = i;
+  				tr[i].lastElementChild.children[0].onclick = function(){
+  					if(this.parentElement.parentElement.previousElementSibling){
+  						tb.insertBefore(this.parentElement.parentElement,this.parentElement.parentElement.previousElementSibling);
+  					}
+  				}
+  				tr[i].lastElementChild.children[1].onclick = function(){
+  					if(this.parentElement.parentElement.nextElementSibling){
+  						tb.insertBefore(this.parentElement.parentElement.nextElementSibling,this.parentElement.parentElement);
+  					}
+  				}
+  				tr[i].lastElementChild.children[2].onclick = function(){
+  					tb.removeChild(this.parentElement.parentElement);
+  					fn();
+  				}
+  			}
+  		};
+  		move();
+  		//全选、反选、批量删除
+  		function allCheck(){
+  			var n = 0;
+  			//全选
+  			for(var i=0;i<checks.length;i++){
+  				checks[i].onclick = function(){
+  					if(this.checked){
+	  					n++;
+	  				}else{
+	  					n--
+	  				}
+	  				if(n==checks.length){
+		  				checkAll.checked = 'checked';
+		  			}else{
+		  				checkAll.checked = '';
+		  			}
+		  			console.log(checks.length)
+  				}
+  			}
+  			checkAll.onclick = function(){
+  				if(n!=checks.length){
+  					n=checks.length;
+  					for(var i=0;i<checks.length;i++){
+  						checks[i].checked = 'checked';
+  					}
+  				}else{
+  					n=0;
+  					for(var i=0;i<checks.length;i++){
+  						checks[i].checked = '';
+  					}
+  				}
+  			}
+  			//反选
+  			btn[0].onclick = function(){
+  				for(var i=0;i<checks.length;i++){
+  					if(checks[i].checked){
+  						checks[i].checked = '';
+  					}else{
+  						checks[i].checked = 'checked';
+  					}
+  				}
+  				n=checks.length-n;
+  				if(n==checks.length){
+  					checkAll.checked = 'checked';
+  				}
+  				if(n==0){
+  					checkAll.checked = '';
+  				}
+  			}
+  			//批量删除
+  			btn[1].onclick = function(){
+  				n=0;
+  				for(var i=0;i<checks.length;i++){
+  					if(checks[i].checked){
+  						tb.removeChild(checks[i].parentElement.parentElement);
+  						i--;
+  					}
+  				}
+  				checkAll.checked = '';
+  				fn();
+  			}
+  		};
+  		allCheck();
+  		//添加数据
+  		form.add.onclick = function(){
+  			var m=5;
+  			if(form.username.value==''){
+  				alert('请输入姓名。');
+  			}else if(form.age.value==''){
+  				alert('请输入年龄。');
+  			}else{
+  				tb.insertRow();
+  				tb.lastElementChild.insertCell().innerHTML =  '<input type="checkbox" name="check"/>';
+  				tb.lastElementChild.insertCell().innerHTML =  ++m;
+  				tb.lastElementChild.insertCell().innerHTML =  form.username.value;
+  				tb.lastElementChild.insertCell().innerHTML =  form.age.value;
+  				tb.lastElementChild.insertCell().innerHTML =  form.sex.value;
+  				tb.lastElementChild.insertCell();
+  				var a1 = document.createElement('a');
+  				var a2 = document.createElement('a');
+  				var a3 = document.createElement('a');
+  				var shu1 = document.createTextNode(' | ');
+  				var shu2 = document.createTextNode(' | ');
+  				a1.innerHTML = '上移';
+  				a2.innerHTML = '下移';
+  				a3.innerHTML = '删除';
+  				a1.href = 'javascript:;';
+  				a2.href = 'javascript:;';
+  				a3.href = 'javascript:;';
+  				a1.onclick = function(){
+  					if(this.parentElement.parentElement.previousElementSibling){
+  						tb.insertBefore(this.parentElement.parentElement,this.parentElement.parentElement.previousElementSibling);
+  					}
+  				}
+  				a2.onclick = function(){
+  					if(this.parentElement.parentElement.nextElementSibling){
+  						tb.insertBefore(this.parentElement.parentElement.nextElementSibling,this.parentElement.parentElement);
+  					}
+  				}
+  				a3.onclick = function(){
+  					tb.removeChild(this.parentElement.parentElement);
+  				}
+  				tb.lastElementChild.lastElementChild.appendChild(a1);
+				tb.lastElementChild.lastElementChild.appendChild(shu1);
+  				tb.lastElementChild.lastElementChild.appendChild(a2);
+				tb.lastElementChild.lastElementChild.appendChild(shu2);
+  				tb.lastElementChild.lastElementChild.appendChild(a3);
+  				fn();
+  				allCheck();
+  			}
+  		}
+  		//排序
+  		function paixu(){
+  			var id = document.getElementById('id');
+  			var age = document.getElementById('age');
+  			var onOff = true;
+  			var onOff1 = true;
+  			id.onclick = function(){
+  				var arr = [];
+  				var arr2 = [];
+  				var td = tb.getElementsByTagName('td');
+				for(var i=1;i<td.length;i+=6){
+					arr.push(td[i]);
+				}
+				if(onOff){
+					arr.sort(function(a,b){
+						return b.innerHTML-a.innerHTML
+					})
+				}else{
+					arr.sort(function(a,b){
+						return a.innerHTML-b.innerHTML
+					})
+				}
+				for(var k=0;k<arr.length;k++){
+					arr2.push(arr[k].parentElement.innerHTML);
+				}
+				tb.innerHTML = '';
+				for(var j=0;j<arr2.length;j++){
+					tb.innerHTML+='<tr>'+arr[j].parentElement.innerHTML+'</tr>';
+				}
+				onOff = !onOff;
+				allCheck();
+				move();
+  			}
+  			age.onclick = function(){
+  				var arr = [];
+  				var arr2 = [];
+  				var td = tb.getElementsByTagName('td');
+				for(var i=3;i<td.length;i+=6){
+					arr.push(td[i]);
+				}
+				if(onOff){
+					arr.sort(function(a,b){
+						return b.innerHTML-a.innerHTML
+					})
+				}else{
+					arr.sort(function(a,b){
+						return a.innerHTML-b.innerHTML
+					})
+				}
+				for(var k=0;k<arr.length;k++){
+					arr2.push(arr[k].parentElement.innerHTML);
+				}
+				tb.innerHTML = '';
+				for(var j=0;j<arr2.length;j++){
+					tb.innerHTML+='<tr>'+arr[j].parentElement.innerHTML+'</tr>';
+				}
+				onOff = !onOff;
+				allCheck();
+				move();
+  			}
+  		}
+  		paixu()
+    </script>
+</body>
+</html>
